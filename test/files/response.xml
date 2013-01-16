@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ISBNdb server_time="2013-01-06T14:05:18Z">
+<BookList total_results="1" page_size="10" page_number="1" shown_results="1">
+<BookData book_id="the_walking_dead_compendium_volume_1" isbn="1607060760" isbn13="9781607060765">
+<Title>The Walking Dead Compendium Volume 1</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Robert Kirkman, Charlie Adlard, Cliff Rathburn, </AuthorsText>
+<PublisherText publisher_id="image_comics">Image Comics</PublisherText>
+<Details change_time="2009-05-25T16:34:32Z" price_time="2013-01-05T18:29:18Z" edition_info="Paperback; 2009-05-20" language="" physical_description_text="6.9&quot;x10.0&quot;x2.0&quot;; 4.9 lb; 1088 pages" lcc_number="" dewey_decimal_normalized="741" dewey_decimal="741" />
+<Summary>Introducing the first eight volumes of this fan-favorite series collected into one massive paperback collection! Collects The Walking Dead #1-48.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Authors>
+<Person person_id="kirkman_robert">Kirkman, Robert</Person>
+<Person person_id="adlard_charlie">Adlard, Charlie</Person>
+<Person person_id="cliff_rathburn">Cliff Rathburn</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>
