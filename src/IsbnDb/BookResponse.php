@@ -27,8 +27,8 @@ class BookResponse extends \IsbnDb\Response implements \Countable
     {
         $xpath = new \DOMXPath($this->response);
 
-        $collectionRoot = $xpath->query('/ISBNdb/' . self::COLLECTION_ROOT);
-        $collectionData = $xpath->query('/ISBNdb/' . self::COLLECTION_ROOT . '/' . self::COLLECTION_DATA);
+        $collectionRoot = $xpath->query('/ISBNdb/BookList');
+        $collectionData = $xpath->query('/ISBNdb/BookList/BookData');
 
         if ( $collectionRoot->length <= 0 ) {
             throw new InvalidResponseException('Result does not contain the expected collection data root.');
@@ -38,7 +38,6 @@ class BookResponse extends \IsbnDb\Response implements \Countable
 
         foreach($collectionData as $dataNode) {
             $this->collection[] = new Book($dataNode);
-            //print_r($this->collection[count($this->collection)-1]);
         }
 
     }

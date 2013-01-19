@@ -1,16 +1,15 @@
-<BookData book_id="the_walking_dead_compendium_volume_1" isbn="1607060760" isbn13="9781607060765">
-<Title>The Walking Dead Compendium Volume 1</Title>
-<TitleLong>The Walking Dead Compendium Volume 1</TitleLong>
-<AuthorsText>Robert Kirkman, Charlie Adlard, Cliff Rathburn, </AuthorsText>
-<PublisherText publisher_id="image_comics">Image Comics</PublisherText>
-<Details change_time="2009-05-25T16:34:32Z" price_time="2013-01-05T18:29:18Z" edition_info="Paperback; 2009-05-20" language="" physical_description_text="6.9&quot;x10.0&quot;x2.0&quot;; 4.9 lb; 1088 pages" lcc_number="" dewey_decimal_normalized="741" dewey_decimal="741" />
-<Summary>Introducing the first eight volumes of this fan-favorite series collected into one massive paperback collection! Collects The Walking Dead #1-48.</Summary>
-<Notes></Notes>
-<UrlsText></UrlsText>
-<AwardsText></AwardsText>
-<Authors>
-<Person person_id="kirkman_robert">Kirkman, Robert</Person>
-<Person person_id="adlard_charlie">Adlard, Charlie</Person>
-<Person person_id="cliff_rathburn">Cliff Rathburn</Person>
-</Authors>
+<BookData book_id="unit_test_book_id" isbn="1607060760" isbn13="9781607060765">
+    <Title>ISBNdb client library unit test</Title>
+    <TitleLong>ISBNdb Client Library Unit Test, First Edition</TitleLong>
+    <AuthorsText>John Doe, Jane Doe, </AuthorsText>
+    <PublisherText publisher_id="unit_test_publisher_id">Unit Test Publishing</PublisherText>
+    <Details change_time="2013-01-01T12:00:00Z" price_time="2013-01-02T20:00:00Z" edition_info="Paperback; 2013-01-01" language="PHP" physical_description_text="6.9&quot;x10.0&quot;x2.0&quot;; 4.9 lb; 1088 pages" lcc_number="KFW100.A75 S45 1997" dewey_decimal_normalized="741.50" dewey_decimal="741/5" />
+    <Summary>Unit test summary.</Summary>
+    <Notes>Unit test notes.</Notes>
+    <UrlsText>Unit test urls text.</UrlsText>
+    <AwardsText>Unit test awards text.</AwardsText>
+    <Authors>
+        <Person person_id="john_doe">Doe, John</Person>
+        <Person person_id="jane_doe">Doe, Jane</Person>
+    </Authors>
 </BookData>

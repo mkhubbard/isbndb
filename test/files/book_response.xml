@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ISBNdb server_time="2013-01-06T14:05:18Z">
+<BookList total_results="2" page_size="10" page_number="1" shown_results="2">
+    <BookData book_id="unit_test_book_id" isbn="1607060760" isbn13="9781607060765">
+        <Title>ISBNdb Client Library Unit Test</Title>
+        <TitleLong>ISBNdb Client Library Unit Test, First Edition</TitleLong>
+        <AuthorsText>John Doe, Jane Doe, </AuthorsText>
+        <PublisherText publisher_id="unit_test_publisher_id">Unit Test Publishing</PublisherText>
+        <Details change_time="2013-01-01T12:00:00Z" price_time="2013-01-02T20:00:00Z" edition_info="Paperback; 2013-01-01" language="PHP" physical_description_text="6.9&quot;x10.0&quot;x2.0&quot;; 4.9 lb; 1088 pages" lcc_number="KFW100.A75 S45 1997" dewey_decimal_normalized="741.50" dewey_decimal="741/5" />
+        <Summary>Unit test summary.</Summary>
+        <Notes>Unit test notes.</Notes>
+        <UrlsText>Unit test urls text.</UrlsText>
+        <AwardsText>Unit test awards text.</AwardsText>
+        <Authors>
+            <Person person_id="john_doe">Doe, John</Person>
+            <Person person_id="jane_doe">Doe, Jane</Person>
+        </Authors>
+    </BookData>/
+    <BookData book_id="unit_test_book_id" isbn="1607060760" isbn13="9781607060765">
+        <Title>ISBNdb Client Library Unit Test</Title>
+        <TitleLong>ISBNdb Client Library Unit Test, First Edition</TitleLong>
+        <AuthorsText>John Doe, Jane Doe, </AuthorsText>
+        <PublisherText publisher_id="unit_test_publisher_id">Unit Test Publishing</PublisherText>
+        <Details change_time="2013-01-01T12:00:00Z" price_time="2013-01-02T20:00:00Z" edition_info="Paperback; 2013-01-01" language="PHP" physical_description_text="6.9&quot;x10.0&quot;x2.0&quot;; 4.9 lb; 1088 pages" lcc_number="KFW100.A75 S45 1997" dewey_decimal_normalized="741.50" dewey_decimal="741/5" />
+        <Summary>Unit test summary.</Summary>
+        <Notes>Unit test notes.</Notes>
+        <UrlsText>Unit test urls text.</UrlsText>
+        <AwardsText>Unit test awards text.</AwardsText>
+        <Authors>
+            <Person person_id="john_doe">Doe, John</Person>
+            <Person person_id="jane_doe">Doe, Jane</Person>
+        </Authors>
+    </BookData>/
+</BookList>
+</ISBNdb>

@@ -2,6 +2,8 @@
 
 namespace IsbnDb;
 
+use IsbnDb\Exception\ResponseParserException;
+
 class Book {
 
     /**
@@ -104,14 +106,70 @@ class Book {
      */
     protected $dewyDecimal;
 
+    /**
+     * @var array
+     */
+    protected $authors;
 
-    public function __construct(\DOMElement $node)
+
+    /**
+     * @static
+     * Convert input string to title case.
+     *
+     * Original Title Case script: John Gruber <daringfireball.net>
+     * Javascript port: David Gouch <individed.com>
+     * PHP port of the above: Kroc Camen <camendesign.com>
+     *
+     * @param $title
+     * @return string
+     */
+    public static function toTitleCase($title)
     {
-        $this->clear();
-        $this->parse($node);
+        //find each word (including punctuation attached)
+        preg_match_all ('/[\w\p{L}&`\'‘’"“\.@:\/\{\(\[<>_]+-? */u', $title, $m1, PREG_OFFSET_CAPTURE);
+        foreach ($m1[0] as &$m2) {
+            //shorthand these- "match" and "index"
+            list ($m, $i) = $m2;
+
+            //correct offsets for multi-byte characters (`PREG_OFFSET_CAPTURE` returns *byte*-offset)
+            //we fix this by recounting the text before the offset using multi-byte aware `strlen`
+            $i = mb_strlen (substr ($title, 0, $i), 'UTF-8');
+
+            //find words that should always be lowercase…
+            //(never on the first word, and never if preceded by a colon)
+            $m = $i>0 && mb_substr ($title, max (0, $i-2), 1, 'UTF-8') !== ':' &&
+                !preg_match ('/[\x{2014}\x{2013}] ?/u', mb_substr ($title, max (0, $i-2), 2, 'UTF-8')) &&
+                preg_match ('/^(a(nd?|s|t)?|b(ut|y)|en|for|i[fn]|o[fnr]|t(he|o)|vs?\.?|via)[ \-]/i', $m)
+                ?	//…and convert them to lowercase
+                mb_strtolower ($m, 'UTF-8')
+
+                //else:	brackets and other wrappers
+                : (	preg_match ('/[\'"_{(\[‘“]/u', mb_substr ($title, max (0, $i-1), 3, 'UTF-8'))
+                    ?	//convert first letter within wrapper to uppercase
+                    mb_substr ($m, 0, 1, 'UTF-8').
+                        mb_strtoupper (mb_substr ($m, 1, 1, 'UTF-8'), 'UTF-8').
+                        mb_substr ($m, 2, mb_strlen ($m, 'UTF-8')-2, 'UTF-8')
+
+                    //else:	do not uppercase these cases
+                    : (	preg_match ('/[\])}]/', mb_substr ($title, max (0, $i-1), 3, 'UTF-8')) ||
+                        preg_match ('/[A-Z]+|&|\w+[._]\w+/u', mb_substr ($m, 1, mb_strlen ($m, 'UTF-8')-1, 'UTF-8'))
+                        ?	$m
+                        //if all else fails, then no more fringe-cases; uppercase the word
+                        :	mb_strtoupper (mb_substr ($m, 0, 1, 'UTF-8'), 'UTF-8').
+                            mb_substr ($m, 1, mb_strlen ($m, 'UTF-8'), 'UTF-8')
+                    ));
+
+            //resplice the title with the change (`substr_replace` is not multi-byte aware)
+            $title = mb_substr ($title, 0, $i, 'UTF-8').$m.
+                mb_substr ($title, $i+mb_strlen ($m, 'UTF-8'), mb_strlen ($title, 'UTF-8'), 'UTF-8')
+            ;
+        }
+
+        //restore the HTML
+        return $title;
     }
 
-    public function clear()
+    public function __construct(\DOMElement $node)
     {
         $this->bookId = null;
         $this->isbn = '';
@@ -125,30 +183,17 @@ class Book {
         $this->notes = '';
         $this->urlsText = '';
         $this->awardsText = '';
-        $this->changeTime = false;
-        $this->priceTime = false;
+        $this->changeTime = null;
+        $this->priceTime = null;
         $this->editionInfo = '';
         $this->language = '';
         $this->physicalDescText = '';
         $this->lccNumber = '';
         $this->dewyDecimalNormalized = '';
         $this->dewyDecimal = '';
-    }
+        $this->authors = array();
 
-    /**
-     * @return string
-     */
-    public function getAuthorsText()
-    {
-        return $this->authorsText;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAwardsText()
-    {
-        return $this->awardsText;
+        $this->parse($node);
     }
 
     /**
@@ -157,38 +202,6 @@ class Book {
     public function getBookId()
     {
         return $this->bookId;
-    }
-
-    /**
-     * @return \DateTime|boolean
-     */
-    public function getChangeTime()
-    {
-        return $this->changeTime;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDewyDecimal()
-    {
-        return $this->dewyDecimal;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDewyDecimalNormalized()
-    {
-        return $this->dewyDecimalNormalized;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEditionInfo()
-    {
-        return $this->editionInfo;
     }
 
     /**
@@ -210,41 +223,25 @@ class Book {
     /**
      * @return string
      */
-    public function getLanguage()
+    public function getTitle()
     {
-        return $this->language;
+        return $this->title;
     }
 
     /**
      * @return string
      */
-    public function getLccNumber()
+    public function getTitleLong()
     {
-        return $this->lccNumber;
+        return $this->titleLong;
     }
 
     /**
      * @return string
      */
-    public function getNotes()
+    public function getAuthorsText()
     {
-        return $this->notes;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPhysicalDescText()
-    {
-        return $this->physicalDescText;
-    }
-
-    /**
-     * @return \DateTime|boolean
-     */
-    public function getPriceTime()
-    {
-        return $this->priceTime;
+        return $this->authorsText;
     }
 
     /**
@@ -274,17 +271,9 @@ class Book {
     /**
      * @return string
      */
-    public function getTitle()
+    public function getNotes()
     {
-        return $this->title;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitleLong()
-    {
-        return $this->titleLong;
+        return $this->notes;
     }
 
     /**
@@ -295,28 +284,116 @@ class Book {
         return $this->urlsText;
     }
 
+    /**
+     * @return string
+     */
+    public function getAwardsText()
+    {
+        return $this->awardsText;
+    }
+
+    /**
+     * @return \DateTime|boolean
+     */
+    public function getChangeTime()
+    {
+        return $this->changeTime;
+    }
+
+    /**
+     * @return \DateTime|boolean
+     */
+    public function getPriceTime()
+    {
+        return $this->priceTime;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEditionInfo()
+    {
+        return $this->editionInfo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhysicalDescText()
+    {
+        return $this->physicalDescText;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLccNumber()
+    {
+        return $this->lccNumber;
+    }
+
+    /**
+     * @param bool $normalized
+     * @return string
+     */
+    public function getDewyDecimal($normalized = true)
+    {
+        if ( $normalized ) {
+            return $this->dewyDecimalNormalized;
+        } else {
+            return $this->dewyDecimal;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getAuthors()
+    {
+        return $this->authors;
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    private function scrubAuthorsText($text)
+    {
+        return rtrim(trim($text), ',');
+    }
+
     private function parse(\DOMElement $node)
     {
+        if (strtolower($node->tagName) !== 'bookdata') {
+            throw new ResponseParserException('Invalid DOMElement passed to parser; expected tagName "BookData" received "' . $node->tagName . "");
+        }
+
+        $this->parseBookDataNode($node);
+
         foreach($node->childNodes as $child) {
             if (!is_a($child, 'DOMElement')) {
                 continue;
             }
 
             switch(strtolower($child->tagName)) {
-                case 'bookdata':
-                    $this->parseBookDataNode($child);
-                    break;
-
                 case 'title':
-                    $this->title = $child->nodeValue;
+                    $this->title = self::toTitleCase($child->nodeValue);
                     break;
 
                 case 'titlelong':
-                    $this->titleLong = $child->nodeValue;
+                    $this->titleLong = self::toTitleCase($child->nodeValue);
                     break;
 
                 case 'authorstext':
-                    $this->authorsText = $child->nodeValue;
+                    $this->authorsText = $this->scrubAuthorsText($child->nodeValue);
                     break;
 
                 case 'publishertext':
@@ -346,6 +423,10 @@ class Book {
                     $this->awardsText = $child->nodeValue;
                     break;
 
+                case 'authors':
+                    $this->parseAuthorsNode($child);
+                    break;
+
                 default:
                     // unhandled values are OK
             }
@@ -355,15 +436,15 @@ class Book {
     private function parseBookDataNode(\DOMElement $node)
     {
         if ( $node->hasAttribute('book_id') ) {
-            $this->bookId = $node->attributes->getNamedItem('book_id')->nodeValue;
+            $this->bookId = trim($node->attributes->getNamedItem('book_id')->nodeValue);
         }
 
         if ( $node->hasAttribute('isbn') ) {
-            $this->isbn = $node->attributes->getNamedItem('isbn')->nodeValue;
+            $this->isbn = trim($node->attributes->getNamedItem('isbn')->nodeValue);
         }
 
         if ( $node->hasAttribute('isbn13') ) {
-            $this->isbn13 = $node->attributes->getNamedItem('isbn13')->nodeValue;
+            $this->isbn13 = trim($node->attributes->getNamedItem('isbn13')->nodeValue);
         }
     }
 
@@ -380,27 +461,41 @@ class Book {
         }
 
         if ( $node->hasAttribute('edition_info') ) {
-            $this->editionInfo = $attr->getNamedItem('edition_info')->nodeValue;
+            $this->editionInfo = trim($attr->getNamedItem('edition_info')->nodeValue);
         }
 
         if ( $node->hasAttribute('language') ) {
-            $this->language = $attr->getNamedItem('language')->nodeValue;
+            $this->language = trim($attr->getNamedItem('language')->nodeValue);
         }
 
         if ( $node->hasAttribute('physical_description_text') ) {
-            $this->physicalDescText = $attr->getNamedItem('physical_description_text')->nodeValue;
+            $this->physicalDescText = trim($attr->getNamedItem('physical_description_text')->nodeValue);
         }
 
         if ( $node->hasAttribute('lcc_number') ) {
-            $this->lccNumber = $attr->getNamedItem('lcc_number')->nodeValue;
+            $this->lccNumber = trim($attr->getNamedItem('lcc_number')->nodeValue);
         }
 
         if ( $node->hasAttribute('dewey_decimal_normalized') ) {
-            $this->dewyDecimalNormalized = $attr->getNamedItem('dewey_decimal_normalized')->nodeValue;
+            $this->dewyDecimalNormalized = trim($attr->getNamedItem('dewey_decimal_normalized')->nodeValue);
         }
 
         if ( $node->hasAttribute('dewey_decimal') ) {
-            $this->dewyDecimal = $attr->getNamedItem('dewey_decimal')->nodeValue;
+            $this->dewyDecimal = trim($attr->getNamedItem('dewey_decimal')->nodeValue);
+        }
+    }
+
+    private function parseAuthorsNode(\DOMElement $node)
+    {
+        foreach($node->childNodes as $child) {
+            if (!is_a($child, 'DOMElement')) {
+                continue;
+            }
+
+            if (strtolower($child->tagName) === 'person') {
+                $this->authors[] = new Person($child);
+
+            }
         }
     }
 
